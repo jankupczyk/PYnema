@@ -30,6 +30,9 @@ host_port = 1337 - free PORT
 avg_tmt = socket.getdefaulttimeout() - avarage default timeout
 ```
 
+```bash
+cv2.VideoCapture('movies\Me_at_the_zoo.mp4') - video u want to watch
+```
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
