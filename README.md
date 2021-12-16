@@ -19,7 +19,7 @@ BUFFOR_SIZE_DATA = 65507 - UDP max packet size to avoid this use TCP instead of 
 ```
 
 ```bash
-host_ip_adress = '' - localhost by default(127.0.0.1
+host_ip_adress = ' ' - localhost by default(127.0.0.1)
 ```
 
 ```bash
