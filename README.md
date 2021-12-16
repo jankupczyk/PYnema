@@ -34,6 +34,18 @@ avg_tmt = socket.getdefaulttimeout() - avarage default timeout
 cv2.VideoCapture('movies\Me_at_the_zoo.mp4') - video u want to watch
 ```
 
+If you want you can change the UDP to TCP, simply change:
+
+1. for UDP
+```bash
+socket.SOCK_DGRAM - UDP/SOCK_DGRAM (no connection)
+```
+
+2. for TCP
+```bash
+socket.SOCK_STREAM - TCP/SOCK_STREAM (in order connection)
+```
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
