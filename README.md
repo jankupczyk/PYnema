@@ -38,12 +38,12 @@ If you want you can change the UDP to TCP, simply change:
 
 1. for UDP
 ```bash
-socket.SOCK_DGRAM - UDP/SOCK_DGRAM (no connection)
+socket.socket(socket.AF_INET, socket.SOCK_DGRAM) - UDP/SOCK_DGRAM (no connection)
 ```
 
 2. for TCP
 ```bash
-socket.SOCK_STREAM - TCP/SOCK_STREAM (in order connection)
+socket.socket(socket.AF_INET,socket.SOCK_STREAM) - TCP/SOCK_STREAM (in order connection)
 ```
 
 ## Contributing
