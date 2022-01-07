@@ -14,7 +14,7 @@ client_socket_main = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 client_socket_main.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFOR_SIZE_DATA)
 
 client_name = socket.gethostname()
-client_ip_adress = '192.168.0.19'
+client_ip_adress = ' '
 client_port = 1337
 
 welcomemessage = "HELLO " + client_name
