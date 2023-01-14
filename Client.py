@@ -1,33 +1,20 @@
-import imutils
-import cv2
-import os
-import numpy as np
-import base64
 import socket
 
+HOST = '127.0.0.1'
+PORT = 1337
 
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((HOST, PORT))
 
-BUFFOR_SIZE_DATA = 65507
+print(client_socket.recv(1024).decode())
 
-# CLIENT SETTINGS
-client_socket_main = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-client_socket_main.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFOR_SIZE_DATA)
-
-client_name = socket.gethostname()
-client_ip_adress = ' '
-client_port = 1337
-
-welcomemessage = "HELLO " + client_name
-
-client_socket_main.sendto(welcomemessage.encode(), (client_ip_adress, client_port))
+url = input("Enter the video url you wanna watch: ")
+client_socket.send(url.encode())
 
 while True:
-    packet,_ = client_socket_main.recvfrom(BUFFOR_SIZE_DATA)
-    data = base64.b85decode(packet,' /')
-    npdata = np.fromstring(data, dtype=np.unit8)
-    frame = cv2.imdecode(npdata, 1)
-    cv2.imshow('Currently watching - ', frame)
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord('c'):
-        client_socket_main.close()
+    audio_data = client_socket.recv(1024)
+    if not audio_data:
         break
+    # play audio here
+
+client_socket.close()

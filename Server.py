@@ -1,58 +1,53 @@
-import imutils
-import cv2
-import os
-import numpy as np
-import base64
 import socket
-import time
-from colorama import Fore
+from datetime import datetime
+import youtube_dl
+import cv2
+
+HOST = '127.0.0.1'
+PORT = 1337
 
 
-BUFFOR_SIZE_DATA = 65507
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((HOST, PORT))
+server_socket.listen()
 
-# SERVER SETTINGS
-server_socket_main = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket_main.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFOR_SIZE_DATA)
+clients = []
 
-print(Fore.RED + 'UDP Server | '+ socket.getfqdn())
-host_name = socket.gethostname()
-print('HOST NAME:',host_name)
-host_ip_adress = '' # Provide the valid IP address
-print('HOST IP:',host_ip_adress)
-host_port = 1337
-print('PORT:',host_port)
-socket_adress_main = (host_ip_adress, host_port)
-server_socket_main.bind(socket_adress_main)
-print('BUFFER:',BUFFOR_SIZE_DATA, 'kB')
-avg_tmt = socket.getdefaulttimeout()
-print('TIMEOUT:',avg_tmt)
-print('INTERFACES:')
-addr_info = socket.if_nameindex()
-print(Fore.YELLOW + '',addr_info)
-print(Fore.WHITE + ' ')
-print(Fore.GREEN + 'Server is listening > > > >')
-print(Fore.WHITE + ' ')
-print(Fore.WHITE + 'Connected devices: ')
-
-# VIDEO U WANT TO WATCH TOGETHER
-server_video_main = cv2.VideoCapture('H:\VSC\PROJEKTY\PYnema\movies\Me_at_the_zoo.mp4')
-
-# MAIN LOOP
-while True:
-    msg, client_addres_obligatory = server_socket_main.recvfrom(BUFFOR_SIZE_DATA)
-    print('Connected from ', client_addres_obligatory)
-    WIDTH = 1024
-    while(server_video_main.isOpened()):
-        _,frame = server_video_main.read()
-        frame = imutils.resize(frame, width=WIDTH)
-        encoded, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
-        message = base64.b64encode(buffer)
-        server_socket_main.sendto(message, client_addres_obligatory)
-        cv2.imshow('HOST | Currently hosting for', frame)
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord('\x1b'): # ESC key
-            server_socket_main.close()
+def download_video(url):
+    ydl_opts = {
+        'outtmpl': 'video.%(ext)s'
+    }
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+    cap = cv2.VideoCapture('video.mp4')
+    while True:
+        ret, frame = cap.read()
+        if not ret:
             break
+        cv2.imshow('Video', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
 
-# AUTHOR: Jan Kupczyk
-# https://github.com/jankupczyk
+def play_video(client_socket, file_path):
+    cap = cv2.VideoCapture(file_path)
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        client_socket.send(frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+
+while True:
+    client_socket, address = server_socket.accept()
+    client_socket.send("#$#$#$#$#$#$#$#$ Welcome to the PYNEMA movie server! #$#$#$#$#$#$#$#$".encode())
+    print(f"New connection - {address[0]}:{address[1]} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    clients.append(client_socket)
+    url = client_socket.recv(1024).decode()
+    download_video(url)
+    file_path = "video.mp4"
+    play_video(client_socket, file_path)
